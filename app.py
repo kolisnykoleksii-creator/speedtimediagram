@@ -125,6 +125,8 @@ if calc_button:
         ax_forces.legend(fontsize=11)
         ax_forces.set_xlim(-20, 100)
         ax_forces.set_ylim(0, 100)
+        # Встановлюємо крок 10 км/год для осі швидкості
+        ax_forces.set_yticks(np.arange(0, 101, 10))
         ax_forces.xaxis.set_major_locator(MultipleLocator(5))
         ax_forces.xaxis.set_major_formatter(FuncFormatter(force_tick_formatter))
         ax_forces.set_aspect(1/6)
