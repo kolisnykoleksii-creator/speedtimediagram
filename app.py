@@ -92,6 +92,12 @@ f_arr = np.array(loco_data["f"])
 traction_force = interp1d(v_arr, f_arr, bounds_error=False, fill_value=0)
 
 if calc_button:
+    
+    # ЗАХИСТ ВІД ПОМИЛОК ПРИ ВВОДІ: конвертуємо в числа та видаляємо порожні рядки
+    edited_profile['Довжина, м'] = pd.to_numeric(edited_profile['Довжина, м'], errors='coerce')
+    edited_profile['Ухил, ‰'] = pd.to_numeric(edited_profile['Ухил, ‰'], errors='coerce')
+    edited_profile = edited_profile.dropna()
+    
     # ------------------------------------------
     # КРОК 1: ДІАГРАМА ПИТОМИХ СИЛ
     # ------------------------------------------
@@ -143,7 +149,7 @@ if calc_button:
 
         progress_bar = st.progress(0)
 
-        # Симуляція (замість while використовуємо ліміт для уникнення зависань)
+        # Симуляція 
         max_iters = int(t_max / dt)
         for i in range(max_iters):
             if s >= total_distance: break
@@ -220,7 +226,13 @@ if calc_button:
         start_x_offset = 5
         x_dist_mapped = start_x_offset + np.array(distance_log) * scale_factor
 
-        fig2, (ax_main, ax_prof) = plt.subplots(2, 1, figsize=(24, 12), gridspec_kw={'height_ratios': [4, 1]}, sharex=True)
+        # ДИНАМІЧНИЙ РОЗРАХУНОК ФІЗИЧНОГО РОЗМІРУ (для уникнення стиснення по вертикалі)
+        max_x = max(100, x_dist_mapped[-1] + 5)
+        width_mm = (max_x - (-20)) * 6   # Повна довжина в міліметрах (масштаб 1 Н/кН = 6 мм)
+        width_inch = width_mm / 25.4     # Дюйми
+        height_inch = 7                  # Фіксована висота близько 18 см
+
+        fig2, (ax_main, ax_prof) = plt.subplots(2, 1, figsize=(width_inch, height_inch), gridspec_kw={'height_ratios': [4, 1]}, sharex=True)
 
         ax_main.plot(-f_p, v_range, 'g', lw=2, label='Тяга: $f_p$')
         ax_main.plot(np.abs(w_x), v_range, 'b', lw=2, label='Вибіг: $\omega_{ox}$')
@@ -243,7 +255,7 @@ if calc_button:
         ax_main.set_ylim(0, 100)
         ax_main.set_yticks(np.arange(0, 101, 10))
         ax_main.set_aspect(1/6)
-        ax_main.set_xlim(-20, max(100, x_dist_mapped[-1] + 5))
+        ax_main.set_xlim(-20, max_x)
         ax_main.xaxis.set_major_locator(MultipleLocator(5))
         ax_main.xaxis.set_major_formatter(FuncFormatter(force_tick_formatter))
         ax_main.set_xlabel('Питомі сили, Н/кН', fontsize=12)
@@ -313,7 +325,10 @@ if calc_button:
                      bbox=dict(facecolor='white', alpha=0.8, edgecolor='black'))
             curr_x += length / 1000
 
-        st.pyplot(fig2)
+        fig2.tight_layout()
+        
+        # ВИВОДИМО З БЕЗУМОВНОЮ ШИРИНОЮ (дозволить прокрутку)
+        st.pyplot(fig2, use_container_width=False)
         
         # Загальні результати
         st.success(f"✅ Розрахунок завершено! Час ходу: {time_log[-1]:.2f} хв. Пройдено: {distance_log[-1]:.2f} км.")
