@@ -16,85 +16,86 @@ if 'calculated' not in st.session_state:
 # ==========================================
 # 1. БАЗИ ДАНИХ ЛОКОМОТИВІВ
 # ==========================================
+# Для пасажирських розширено шкалу швидкості до 160 км/год
 LOCOMOTIVES = {
     "ТГ16 (За замовчуванням)": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [400, 380, 300, 240, 190, 150, 120, 100, 80, 60, 40],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120],
+        "f": [400, 380, 300, 240, 190, 150, 120, 100, 80, 60, 40, 20],
         "mass": 120.0
     },
     "ВЛ80с": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [650, 650, 630, 580, 480, 380, 310, 260, 220, 190, 160],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120],
+        "f": [650, 650, 630, 580, 480, 380, 310, 260, 220, 190, 160, 110],
         "mass": 192.0
     },
     "ВЛ80т": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [640, 640, 620, 570, 475, 375, 305, 255, 215, 185, 155],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120],
+        "f": [640, 640, 620, 570, 475, 375, 305, 255, 215, 185, 155, 105],
         "mass": 192.0
     },
     "ВЛ10 (Вантажний, пост. струм)": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [650, 650, 600, 500, 390, 310, 240, 190, 150, 120, 100],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120],
+        "f": [650, 650, 600, 500, 390, 310, 240, 190, 150, 120, 100, 70],
         "mass": 184.0
     },
     "ВЛ8 (Вантажний, пост. струм)": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [640, 640, 600, 480, 380, 300, 230, 180, 140, 110, 90],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120],
+        "f": [640, 640, 600, 480, 380, 300, 230, 180, 140, 110, 90, 60],
         "mass": 184.0
     },
     "ВЛ11 (Вантажний, пост. струм)": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [650, 650, 610, 510, 400, 320, 250, 195, 155, 125, 100],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120],
+        "f": [650, 650, 610, 510, 400, 320, 250, 195, 155, 125, 100, 70],
         "mass": 184.0
     },
     "ВЛ11м5 (Вантажний, пост. струм)": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [670, 670, 630, 530, 420, 340, 270, 210, 165, 135, 110],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120],
+        "f": [670, 670, 630, 530, 420, 340, 270, 210, 165, 135, 110, 80],
         "mass": 184.0
     },
     "ДЕ1 (Вантажний, пост. струм)": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [700, 700, 680, 550, 450, 350, 280, 220, 170, 130, 100],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120],
+        "f": [700, 700, 680, 550, 450, 350, 280, 220, 170, 130, 100, 75],
         "mass": 184.0
     },
     "ДС3 (Пасажирський, змін. струм)": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [320, 320, 310, 300, 280, 240, 200, 170, 145, 125, 110],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160],
+        "f": [320, 320, 310, 300, 280, 240, 200, 170, 145, 125, 110, 85, 65, 50],
         "mass": 84.0
     },
     "2ЕЛ5 (Вантажний, змін. струм)": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [700, 700, 680, 600, 500, 400, 330, 270, 220, 180, 150],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120],
+        "f": [700, 700, 680, 600, 500, 400, 330, 270, 220, 180, 150, 110],
         "mass": 192.0
     },
     "2ТЕ116": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [500, 480, 420, 320, 240, 190, 150, 120, 100, 85, 70],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120],
+        "f": [500, 480, 420, 320, 240, 190, 150, 120, 100, 85, 70, 50],
         "mass": 276.0
     },
     "2ТЕ10М": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [520, 500, 430, 330, 250, 200, 160, 130, 105, 90, 75],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120],
+        "f": [520, 500, 430, 330, 250, 200, 160, 130, 105, 90, 75, 55],
         "mass": 276.0
     },
     "ТЕП70 (Пасажирський)": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [320, 300, 260, 220, 180, 150, 125, 105, 90, 75, 65],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160],
+        "f": [320, 300, 260, 220, 180, 150, 125, 105, 90, 75, 65, 50, 40, 30],
         "mass": 135.0
     },
     "ЧС4 (Пасажирський, змін. струм)": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [300, 290, 270, 240, 200, 170, 140, 120, 100, 85, 75],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160],
+        "f": [300, 290, 270, 240, 200, 170, 140, 120, 100, 85, 75, 60, 45, 35],
         "mass": 123.0
     },
     "ЧС2 (Пасажирський, пост. струм)": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [320, 320, 310, 270, 220, 180, 140, 110, 90, 75, 60],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160],
+        "f": [320, 320, 310, 270, 220, 180, 140, 110, 90, 75, 60, 45, 30, 20],
         "mass": 120.0
     },
     "ЧС7 (Пасажирський, пост. струм)": {
-        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "f": [450, 450, 420, 360, 290, 240, 200, 160, 130, 110, 95],
+        "v": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160],
+        "f": [450, 450, 420, 360, 290, 240, 200, 160, 130, 110, 95, 75, 55, 40],
         "mass": 172.0
     }
 }
@@ -171,22 +172,37 @@ if st.session_state.calculated:
     edited_profile = edited_profile.dropna()
     
     # ------------------------------------------
+    # ДИНАМІЧНИЙ РОЗРАХУНОК МЕЖ ГРАФІКІВ
+    # ------------------------------------------
+    # Максимальна швидкість для осі Y (враховує і перегін, і можливості локомотива)
+    v_plot_max = max(100, int(v_max_section + 10), int(np.max(v_arr)))
+    v_plot_max = int(np.ceil(v_plot_max / 10) * 10)  # Округлення до десятків
+    v_range = np.linspace(0, v_plot_max, int(v_plot_max) * 2)
+
+    f_k_spec = (traction_force(v_range) * 1000) / (m_total * g) 
+    w_o_spec = specific_resistance(v_range)
+    b_t_spec = specific_braking(v_range, theta)
+
+    f_p = f_k_spec - w_o_spec          
+    w_x = -w_o_spec                    
+    b_p = -b_t_spec - w_o_spec         
+
+    # Динамічні межі для осі X (щоб влазили будь-які пікові значення сил)
+    force_min_x = np.floor(np.min(-f_p) / 10) * 10 - 10
+    if force_min_x > -20: force_min_x = -20
+    
+    force_max_x = np.ceil(np.max(np.abs(b_p)) / 10) * 10 + 10
+    if force_max_x < 100: force_max_x = 100
+
+    # ------------------------------------------
     # КРОК 1: ДІАГРАМА ПИТОМИХ СИЛ
     # ------------------------------------------
     with tab1:
         st.subheader(f"Діаграма прискорюючих і сповільнюючих сил ({loco_name})")
         
-        v_range = np.linspace(0, 100, 100)
-        f_k_spec = (traction_force(v_range) * 1000) / (m_total * g) 
-        w_o_spec = specific_resistance(v_range)
-        b_t_spec = specific_braking(v_range, theta)
-
-        f_p = f_k_spec - w_o_spec          
-        w_x = -w_o_spec                    
-        b_p = -b_t_spec - w_o_spec         
-
-        fig1_w = (120 * 6) / 25.4 + 1.0  
-        fig1_h = (100 * 1) / 25.4 + 1.0  
+        # Перераховуємо фізичний розмір (6 мм = 1 Н/кН, 1 мм = 1 км/год)
+        fig1_w = ((force_max_x - force_min_x) * 6) / 25.4 + 1.0  
+        fig1_h = (v_plot_max * 1) / 25.4 + 1.0  
 
         fig1, ax_forces = plt.subplots(figsize=(fig1_w, fig1_h))
         ax_forces.plot(-f_p, v_range, 'g', lw=2, label=r'Тяга: $f_p$')
@@ -198,10 +214,13 @@ if st.session_state.calculated:
         ax_forces.set_xlabel('Питомі сили, Н/кН', fontsize=12)
         ax_forces.grid(True, linestyle='--')
         ax_forces.legend(fontsize=11)
-        ax_forces.set_xlim(-20, 100)
-        ax_forces.set_ylim(0, 100)
-        ax_forces.set_yticks(np.arange(0, 101, 10))
-        ax_forces.xaxis.set_major_locator(MultipleLocator(5))
+        
+        # Використовуємо динамічні межі
+        ax_forces.set_xlim(force_min_x, force_max_x)
+        ax_forces.set_ylim(0, v_plot_max)
+        ax_forces.set_yticks(np.arange(0, v_plot_max + 1, 10))
+        
+        ax_forces.xaxis.set_major_locator(MultipleLocator(10 if (force_max_x - force_min_x) > 200 else 5))
         ax_forces.xaxis.set_major_formatter(FuncFormatter(force_tick_formatter))
         ax_forces.set_aspect(1/6)
         
@@ -307,13 +326,15 @@ if st.session_state.calculated:
         
         # --- ПОБУДОВА ГРАФІКА РУХУ ---
         scale_factor = 40 / 6 
-        start_x_offset = 5
+        
+        # Зміщуємо вісь відстані на початок осі координат Y (з урахуванням негативної зони тяги)
+        start_x_offset = abs(force_min_x)
         x_dist_mapped = start_x_offset + np.array(distance_log) * scale_factor
 
-        max_x = max(100, x_dist_mapped[-1] + 5)
+        max_x = max(force_max_x, x_dist_mapped[-1] + 5)
         
-        fig_w = ((max_x + 20) * 6) / 25.4 + 1.0
-        fig_h_main = 100 / 25.4
+        fig_w = ((max_x - force_min_x) * 6) / 25.4 + 1.0
+        fig_h_main = v_plot_max / 25.4
         fig_h_total = fig_h_main * 1.25 + 2.0  
 
         fig2, (ax_main, ax_prof) = plt.subplots(2, 1, figsize=(fig_w, fig_h_total), gridspec_kw={'height_ratios': [4, 1]}, sharex=True)
@@ -331,7 +352,6 @@ if st.session_state.calculated:
         ax_main.hlines(v_max_section, start_x_offset, x_dist_mapped[-1], colors='purple', linestyles='dashed', lw=1.5, label='Обмеження (перегін)')
         ax_main.hlines(v_p, start_x_offset, x_dist_mapped[-1], colors='green', linestyles='dotted', lw=1.5, label='Розрахункова швидкість')
 
-        # Виводимо літери з інтервалом мінімум 0.2 км (200 метрів)
         ax_main.text(x_dist_mapped[0], velocity_log[0] + 3, mode_log[0], fontsize=10, color='black', fontweight='bold')
         last_label_dist = distance_log[0]
         
@@ -342,16 +362,20 @@ if st.session_state.calculated:
                     last_label_dist = distance_log[i]
 
         ax_main.set_ylabel('Швидкість v, км/год', fontsize=12)
-        ax_main.set_ylim(0, 100)
-        ax_main.set_yticks(np.arange(0, 101, 10))
+        ax_main.set_ylim(0, v_plot_max)
+        ax_main.set_yticks(np.arange(0, v_plot_max + 1, 10))
         ax_main.set_aspect(1/6)
-        ax_main.set_xlim(-20, max_x)
-        ax_main.xaxis.set_major_locator(MultipleLocator(5))
+        ax_main.set_xlim(force_min_x, max_x)
+        ax_main.xaxis.set_major_locator(MultipleLocator(10 if (max_x - force_min_x) > 200 else 5))
         ax_main.xaxis.set_major_formatter(FuncFormatter(force_tick_formatter))
         ax_main.set_xlabel('Питомі сили, Н/кН', fontsize=12)
 
         x_time_plot, y_time_plot = [], []
         current_period = 0
+        
+        # Динамічний масштаб для осі часу, щоб 10 хв = 100 по висоті для збігу
+        time_scale_factor = v_plot_max / 10.0
+
         for i in range(len(time_log)):
             t_curr, x = time_log[i], x_dist_mapped[i]
             if t_curr // 10 > current_period and i > 0:
@@ -360,15 +384,15 @@ if st.session_state.calculated:
                 ratio = (t_target - t_prev) / (t_curr - t_prev) if (t_curr - t_prev) != 0 else 0
                 x_target = x_prev + ratio * (x - x_prev)
                 x_time_plot.extend([x_target, x_target])
-                y_time_plot.extend([100.0, 0.0])
+                y_time_plot.extend([float(v_plot_max), 0.0])
                 current_period += 1
             x_time_plot.append(x)
-            y_time_plot.append((t_curr - current_period * 10) * 10)
+            y_time_plot.append((t_curr - current_period * 10) * time_scale_factor)
 
         ax_main.plot(x_time_plot, y_time_plot, color='red', linestyle='--', lw=2, label='Час t')
-        secax_time = ax_main.secondary_yaxis('right', functions=(lambda y: y / 10, lambda y: y * 10))
+        secax_time = ax_main.secondary_yaxis('right', functions=(lambda y: y / time_scale_factor, lambda y: y * time_scale_factor))
         secax_time.set_ylabel('Час t, хв', color='red', fontsize=12)
-        secax_time.set_yticks(np.arange(0, 11, 1))
+        secax_time.set_yticks(np.arange(0, int(np.ceil(time_log[-1])) + 2, 1))
 
         ax_main.legend(loc='upper right')
         ax_main.grid(True, linestyle='--')
@@ -402,7 +426,7 @@ if st.session_state.calculated:
         ax_prof_km.xaxis.set_ticks_position('bottom')
         ax_prof_km.xaxis.set_label_position('bottom')
         ax_prof_km.spines['bottom'].set_position(('outward', 0))
-        ax_prof_km.set_xlabel(f'Відстань S, км (початок відліку: -{start_x_offset} Н/кН)', color='blue', fontsize=12)
+        ax_prof_km.set_xlabel(f'Відстань S, км (початок відліку: 0 км)', color='blue', fontsize=12)
         ax_prof.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
 
         curr_x = 0
