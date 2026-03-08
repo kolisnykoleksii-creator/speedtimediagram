@@ -8,6 +8,10 @@ from matplotlib.ticker import FuncFormatter, MultipleLocator
 # Налаштування сторінки
 st.set_page_config(page_title="Тягові розрахунки", layout="wide")
 
+# Ініціалізація стану для збереження результатів
+if 'calculated' not in st.session_state:
+    st.session_state.calculated = False
+
 # ==========================================
 # 1. БАЗИ ДАНИХ ЛОКОМОТИВІВ
 # ==========================================
@@ -76,6 +80,9 @@ edited_profile = st.sidebar.data_editor(default_profile, num_rows="dynamic")
 
 calc_button = st.sidebar.button("🚀 Розрахувати", use_container_width=True)
 
+if calc_button:
+    st.session_state.calculated = True
+
 # ==========================================
 # 4. ГОЛОВНЕ ВІКНО - РЕЗУЛЬТАТИ ТА ГРАФІКИ
 # ==========================================
@@ -91,7 +98,7 @@ v_arr = np.array(loco_data["v"])
 f_arr = np.array(loco_data["f"])
 traction_force = interp1d(v_arr, f_arr, bounds_error=False, fill_value=0)
 
-if calc_button:
+if st.session_state.calculated:
     
     edited_profile['Довжина, м'] = pd.to_numeric(edited_profile['Довжина, м'], errors='coerce')
     edited_profile['Ухил, ‰'] = pd.to_numeric(edited_profile['Ухил, ‰'], errors='coerce')
