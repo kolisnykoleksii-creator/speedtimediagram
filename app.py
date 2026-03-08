@@ -124,9 +124,9 @@ if st.session_state.calculated:
         fig1_h = (100 * 1) / 25.4 + 1.0  # 100 од. по 1 мм + відступи
 
         fig1, ax_forces = plt.subplots(figsize=(fig1_w, fig1_h))
-        ax_forces.plot(-f_p, v_range, 'g', lw=2, label='Тяга: $f_p$')
-        ax_forces.plot(np.abs(w_x), v_range, 'b', lw=2, label='Вибіг: $\omega_{ox}$')
-        ax_forces.plot(np.abs(b_p), v_range, 'r', lw=2, label='Гальмування: $b_t + \omega_{ox}$')
+        ax_forces.plot(-f_p, v_range, 'g', lw=2, label=r'Тяга: $f_p$')
+        ax_forces.plot(np.abs(w_x), v_range, 'b', lw=2, label=r'Вибіг: $\omega_{ox}$')
+        ax_forces.plot(np.abs(b_p), v_range, 'r', lw=2, label=r'Гальмування: $b_t + \omega_{ox}$')
         
         ax_forces.axvline(0, color='black', lw=1.5)
         ax_forces.set_ylabel('Швидкість v, км/год', fontsize=12)
@@ -254,9 +254,9 @@ if st.session_state.calculated:
 
         fig2, (ax_main, ax_prof) = plt.subplots(2, 1, figsize=(fig_w, fig_h_total), gridspec_kw={'height_ratios': [4, 1]}, sharex=True)
 
-        ax_main.plot(-f_p, v_range, 'g', lw=2, label='Тяга: $f_p$')
-        ax_main.plot(np.abs(w_x), v_range, 'b', lw=2, label='Вибіг: $\omega_{ox}$')
-        ax_main.plot(np.abs(b_p), v_range, 'r', lw=2, label='Гальмування: $b_t + \omega_{ox}$')
+        ax_main.plot(-f_p, v_range, 'g', lw=2, label=r'Тяга: $f_p$')
+        ax_main.plot(np.abs(w_x), v_range, 'b', lw=2, label=r'Вибіг: $\omega_{ox}$')
+        ax_main.plot(np.abs(b_p), v_range, 'r', lw=2, label=r'Гальмування: $b_t + \omega_{ox}$')
         ax_main.axvline(0, color='black', lw=1.5)
 
         ax_main.plot(x_dist_mapped, velocity_log, color='blue', lw=2, label='Швидкість v')
