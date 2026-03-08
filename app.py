@@ -93,7 +93,6 @@ traction_force = interp1d(v_arr, f_arr, bounds_error=False, fill_value=0)
 
 if calc_button:
     
-    # ЗАХИСТ ВІД ПОМИЛОК ПРИ ВВОДІ: конвертуємо в числа та видаляємо порожні рядки
     edited_profile['Довжина, м'] = pd.to_numeric(edited_profile['Довжина, м'], errors='coerce')
     edited_profile['Ухил, ‰'] = pd.to_numeric(edited_profile['Ухил, ‰'], errors='coerce')
     edited_profile = edited_profile.dropna()
@@ -113,7 +112,11 @@ if calc_button:
         w_x = -w_o_spec                    
         b_p = -b_t_spec - w_o_spec         
 
-        fig1, ax_forces = plt.subplots(figsize=(10, 6))
+        # Динамічний точний розрахунок розміру для уникнення дрібного тексту
+        fig1_w = (120 * 6) / 25.4 + 1.0  # від -20 до 100 (120 од.) по 6 мм + відступи
+        fig1_h = (100 * 1) / 25.4 + 1.0  # 100 од. по 1 мм + відступи
+
+        fig1, ax_forces = plt.subplots(figsize=(fig1_w, fig1_h))
         ax_forces.plot(-f_p, v_range, 'g', lw=2, label='Тяга: $f_p$')
         ax_forces.plot(np.abs(w_x), v_range, 'b', lw=2, label='Вибіг: $\omega_{ox}$')
         ax_forces.plot(np.abs(b_p), v_range, 'r', lw=2, label='Гальмування: $b_t + \omega_{ox}$')
@@ -125,19 +128,26 @@ if calc_button:
         ax_forces.legend(fontsize=11)
         ax_forces.set_xlim(-20, 100)
         ax_forces.set_ylim(0, 100)
-        # Встановлюємо крок 10 км/год для осі швидкості
         ax_forces.set_yticks(np.arange(0, 101, 10))
         ax_forces.xaxis.set_major_locator(MultipleLocator(5))
         ax_forces.xaxis.set_major_formatter(FuncFormatter(force_tick_formatter))
         ax_forces.set_aspect(1/6)
         
-        st.pyplot(fig1)
+        # ВИВОДИМО БЕЗ СТИСНЕННЯ (з'явиться горизонтальний скрол)
+        st.pyplot(fig1, use_container_width=False)
 
     # ------------------------------------------
     # КРОК 2: ІНТЕГРУВАННЯ ТА ГРАФІК РУХУ
     # ------------------------------------------
     with tab2:
         st.subheader("Побудова кривих швидкості, часу та профілю колії")
+        
+        # ДОДАНО: Інтерактивні панелі для наближення графіка
+        col1, col2 = st.columns(2)
+        with col1:
+            stretch_x = st.slider("↔️ Розтягнути дистанцію (щоб розгледіти літери):", min_value=1.0, max_value=5.0, value=1.0, step=0.5)
+        with col2:
+            zoom_all = st.slider("🔍 Збільшити весь графік (Зум):", min_value=1.0, max_value=3.0, value=1.0, step=0.5)
         
         dt = 1.0 
         t_max = 7200 
@@ -151,7 +161,6 @@ if calc_button:
 
         progress_bar = st.progress(0)
 
-        # Симуляція 
         max_iters = int(t_max / dt)
         for i in range(max_iters):
             if s >= total_distance: break
@@ -224,17 +233,19 @@ if calc_button:
         progress_bar.progress(1.0)
         
         # --- ПОБУДОВА ГРАФІКА РУХУ ---
-        scale_factor = 40 / 6
+        # Враховуємо коефіцієнт розтягування дистанції
+        scale_factor = (40 * stretch_x) / 6 
         start_x_offset = 5
         x_dist_mapped = start_x_offset + np.array(distance_log) * scale_factor
 
-        # ДИНАМІЧНИЙ РОЗРАХУНОК ФІЗИЧНОГО РОЗМІРУ (для уникнення стиснення по вертикалі)
         max_x = max(100, x_dist_mapped[-1] + 5)
-        width_mm = (max_x - (-20)) * 6   # Повна довжина в міліметрах (масштаб 1 Н/кН = 6 мм)
-        width_inch = width_mm / 25.4     # Дюйми
-        height_inch = 7                  # Фіксована висота близько 18 см
+        
+        # Точний розрахунок розмірів полотна для Кроку 2
+        fig_w = ((max_x + 20) * 6 * zoom_all) / 25.4 + 1.0
+        fig_h_main = (100 * zoom_all) / 25.4
+        fig_h_total = fig_h_main * 1.25 + 2.0  # Висота головного + профілю (1/4) + відступи
 
-        fig2, (ax_main, ax_prof) = plt.subplots(2, 1, figsize=(width_inch, height_inch), gridspec_kw={'height_ratios': [4, 1]}, sharex=True)
+        fig2, (ax_main, ax_prof) = plt.subplots(2, 1, figsize=(fig_w, fig_h_total), gridspec_kw={'height_ratios': [4, 1]}, sharex=True)
 
         ax_main.plot(-f_p, v_range, 'g', lw=2, label='Тяга: $f_p$')
         ax_main.plot(np.abs(w_x), v_range, 'b', lw=2, label='Вибіг: $\omega_{ox}$')
@@ -249,9 +260,10 @@ if calc_button:
         ax_main.hlines(v_max_section, start_x_offset, x_dist_mapped[-1], colors='purple', linestyles='dashed', lw=1.5, label='Обмеження (перегін)')
         ax_main.hlines(v_p, start_x_offset, x_dist_mapped[-1], colors='green', linestyles='dotted', lw=1.5, label='Розрахункова швидкість')
 
-        for i in range(1, len(mode_log), max(1, len(mode_log)//50)):
+        # Виводимо літери кожного разу, коли режим змінився
+        for i in range(1, len(mode_log)):
             if mode_log[i] != mode_log[i-1]:
-                ax_main.text(x_dist_mapped[i], velocity_log[i] + 3, mode_log[i], fontsize=10, color='black', fontweight='bold')
+                ax_main.text(x_dist_mapped[i], velocity_log[i] + 3, mode_log[i], fontsize=10*zoom_all, color='black', fontweight='bold')
 
         ax_main.set_ylabel('Швидкість v, км/год', fontsize=12)
         ax_main.set_ylim(0, 100)
@@ -323,14 +335,12 @@ if calc_button:
             grad = row['Ухил, ‰']
             mid_km = curr_x + (length / 1000) / 2
             mid_mapped = start_x_offset + mid_km * scale_factor
-            ax_prof.text(mid_mapped, min_y - 12, f'{grad} ‰ | {length} м', ha='center', va='center', fontsize=10, 
+            ax_prof.text(mid_mapped, min_y - 12, f'{grad} ‰ | {length} м', ha='center', va='center', fontsize=10*zoom_all, 
                      bbox=dict(facecolor='white', alpha=0.8, edgecolor='black'))
             curr_x += length / 1000
 
         fig2.tight_layout()
         
-        # ВИВОДИМО З БЕЗУМОВНОЮ ШИРИНОЮ (дозволить прокрутку)
         st.pyplot(fig2, use_container_width=False)
         
-        # Загальні результати
         st.success(f"✅ Розрахунок завершено! Час ходу: {time_log[-1]:.2f} хв. Пройдено: {distance_log[-1]:.2f} км.")
