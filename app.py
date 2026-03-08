@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from matplotlib.ticker import FuncFormatter, MultipleLocator
+import io
 
 # Налаштування сторінки
 st.set_page_config(page_title="Тягові розрахунки", layout="wide")
@@ -119,9 +120,8 @@ if st.session_state.calculated:
         w_x = -w_o_spec                    
         b_p = -b_t_spec - w_o_spec         
 
-        # Динамічний точний розрахунок розміру для уникнення дрібного тексту
-        fig1_w = (120 * 6) / 25.4 + 1.0  # від -20 до 100 (120 од.) по 6 мм + відступи
-        fig1_h = (100 * 1) / 25.4 + 1.0  # 100 од. по 1 мм + відступи
+        fig1_w = (120 * 6) / 25.4 + 1.0  
+        fig1_h = (100 * 1) / 25.4 + 1.0  
 
         fig1, ax_forces = plt.subplots(figsize=(fig1_w, fig1_h))
         ax_forces.plot(-f_p, v_range, 'g', lw=2, label=r'Тяга: $f_p$')
@@ -140,21 +140,23 @@ if st.session_state.calculated:
         ax_forces.xaxis.set_major_formatter(FuncFormatter(force_tick_formatter))
         ax_forces.set_aspect(1/6)
         
-        # ВИВОДИМО БЕЗ СТИСНЕННЯ (з'явиться горизонтальний скрол)
         st.pyplot(fig1, use_container_width=False)
+        
+        # Кнопка для завантаження в високій якості
+        buf1 = io.BytesIO()
+        fig1.savefig(buf1, format="png", dpi=300, bbox_inches='tight')
+        st.download_button(
+            label="💾 Завантажити діаграму у високій якості",
+            data=buf1.getvalue(),
+            file_name="diagrama_syl.png",
+            mime="image/png"
+        )
 
     # ------------------------------------------
     # КРОК 2: ІНТЕГРУВАННЯ ТА ГРАФІК РУХУ
     # ------------------------------------------
     with tab2:
         st.subheader("Побудова кривих швидкості, часу та профілю колії")
-        
-        # ДОДАНО: Інтерактивні панелі для наближення графіка
-        col1, col2 = st.columns(2)
-        with col1:
-            stretch_x = st.slider("↔️ Розтягнути дистанцію (щоб розгледіти літери):", min_value=1.0, max_value=5.0, value=1.0, step=0.5)
-        with col2:
-            zoom_all = st.slider("🔍 Збільшити весь графік (Зум):", min_value=1.0, max_value=3.0, value=1.0, step=0.5)
         
         dt = 1.0 
         t_max = 7200 
@@ -240,17 +242,15 @@ if st.session_state.calculated:
         progress_bar.progress(1.0)
         
         # --- ПОБУДОВА ГРАФІКА РУХУ ---
-        # Враховуємо коефіцієнт розтягування дистанції
-        scale_factor = (40 * stretch_x) / 6 
+        scale_factor = 40 / 6 
         start_x_offset = 5
         x_dist_mapped = start_x_offset + np.array(distance_log) * scale_factor
 
         max_x = max(100, x_dist_mapped[-1] + 5)
         
-        # Точний розрахунок розмірів полотна для Кроку 2
-        fig_w = ((max_x + 20) * 6 * zoom_all) / 25.4 + 1.0
-        fig_h_main = (100 * zoom_all) / 25.4
-        fig_h_total = fig_h_main * 1.25 + 2.0  # Висота головного + профілю (1/4) + відступи
+        fig_w = ((max_x + 20) * 6) / 25.4 + 1.0
+        fig_h_main = 100 / 25.4
+        fig_h_total = fig_h_main * 1.25 + 2.0  
 
         fig2, (ax_main, ax_prof) = plt.subplots(2, 1, figsize=(fig_w, fig_h_total), gridspec_kw={'height_ratios': [4, 1]}, sharex=True)
 
@@ -267,10 +267,9 @@ if st.session_state.calculated:
         ax_main.hlines(v_max_section, start_x_offset, x_dist_mapped[-1], colors='purple', linestyles='dashed', lw=1.5, label='Обмеження (перегін)')
         ax_main.hlines(v_p, start_x_offset, x_dist_mapped[-1], colors='green', linestyles='dotted', lw=1.5, label='Розрахункова швидкість')
 
-        # Виводимо літери кожного разу, коли режим змінився
         for i in range(1, len(mode_log)):
             if mode_log[i] != mode_log[i-1]:
-                ax_main.text(x_dist_mapped[i], velocity_log[i] + 3, mode_log[i], fontsize=10*zoom_all, color='black', fontweight='bold')
+                ax_main.text(x_dist_mapped[i], velocity_log[i] + 3, mode_log[i], fontsize=10, color='black', fontweight='bold')
 
         ax_main.set_ylabel('Швидкість v, км/год', fontsize=12)
         ax_main.set_ylim(0, 100)
@@ -342,12 +341,22 @@ if st.session_state.calculated:
             grad = row['Ухил, ‰']
             mid_km = curr_x + (length / 1000) / 2
             mid_mapped = start_x_offset + mid_km * scale_factor
-            ax_prof.text(mid_mapped, min_y - 12, f'{grad} ‰ | {length} м', ha='center', va='center', fontsize=10*zoom_all, 
+            ax_prof.text(mid_mapped, min_y - 12, f'{grad} ‰ | {length} м', ha='center', va='center', fontsize=10, 
                      bbox=dict(facecolor='white', alpha=0.8, edgecolor='black'))
             curr_x += length / 1000
 
         fig2.tight_layout()
         
         st.pyplot(fig2, use_container_width=False)
+        
+        # Кнопка для завантаження в високій якості
+        buf2 = io.BytesIO()
+        fig2.savefig(buf2, format="png", dpi=300, bbox_inches='tight')
+        st.download_button(
+            label="💾 Завантажити графік руху у високій якості",
+            data=buf2.getvalue(),
+            file_name="grafik_ruhu.png",
+            mime="image/png"
+        )
         
         st.success(f"✅ Розрахунок завершено! Час ходу: {time_log[-1]:.2f} хв. Пройдено: {distance_log[-1]:.2f} км.")
