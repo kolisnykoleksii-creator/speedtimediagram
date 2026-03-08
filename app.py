@@ -369,6 +369,7 @@ if st.session_state.calculated:
         ax_main.xaxis.set_major_locator(MultipleLocator(10 if (max_x - force_min_x) > 200 else 5))
         ax_main.xaxis.set_major_formatter(FuncFormatter(force_tick_formatter))
         ax_main.set_xlabel('Питомі сили, Н/кН', fontsize=12)
+        ax_main.tick_params(axis='x', labelbottom=True) # Примусове відображення міток осі X
 
         x_time_plot, y_time_plot = [], []
         current_period = 0
