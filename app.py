@@ -142,7 +142,6 @@ if st.session_state.calculated:
         
         st.pyplot(fig1, use_container_width=False)
         
-        # Кнопка для завантаження в високій якості
         buf1 = io.BytesIO()
         fig1.savefig(buf1, format="png", dpi=300, bbox_inches='tight')
         st.download_button(
@@ -267,9 +266,15 @@ if st.session_state.calculated:
         ax_main.hlines(v_max_section, start_x_offset, x_dist_mapped[-1], colors='purple', linestyles='dashed', lw=1.5, label='Обмеження (перегін)')
         ax_main.hlines(v_p, start_x_offset, x_dist_mapped[-1], colors='green', linestyles='dotted', lw=1.5, label='Розрахункова швидкість')
 
+        # Виводимо літери з інтервалом мінімум 0.2 км (200 метрів)
+        ax_main.text(x_dist_mapped[0], velocity_log[0] + 3, mode_log[0], fontsize=10, color='black', fontweight='bold')
+        last_label_dist = distance_log[0]
+        
         for i in range(1, len(mode_log)):
             if mode_log[i] != mode_log[i-1]:
-                ax_main.text(x_dist_mapped[i], velocity_log[i] + 3, mode_log[i], fontsize=10, color='black', fontweight='bold')
+                if distance_log[i] - last_label_dist > 0.2:
+                    ax_main.text(x_dist_mapped[i], velocity_log[i] + 3, mode_log[i], fontsize=10, color='black', fontweight='bold')
+                    last_label_dist = distance_log[i]
 
         ax_main.set_ylabel('Швидкість v, км/год', fontsize=12)
         ax_main.set_ylim(0, 100)
@@ -349,7 +354,6 @@ if st.session_state.calculated:
         
         st.pyplot(fig2, use_container_width=False)
         
-        # Кнопка для завантаження в високій якості
         buf2 = io.BytesIO()
         fig2.savefig(buf2, format="png", dpi=300, bbox_inches='tight')
         st.download_button(
