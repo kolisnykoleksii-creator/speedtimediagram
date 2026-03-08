@@ -327,8 +327,8 @@ if st.session_state.calculated:
         # --- ПОБУДОВА ГРАФІКА РУХУ ---
         scale_factor = 40 / 6 
         
-        # Зміщуємо вісь відстані на початок осі координат Y (з урахуванням негативної зони тяги)
-        start_x_offset = abs(force_min_x)
+        # Зміщуємо вісь відстані на позначку 5 (відповідає -5 Н/кН), як було спочатку
+        start_x_offset = 5
         x_dist_mapped = start_x_offset + np.array(distance_log) * scale_factor
 
         max_x = max(force_max_x, x_dist_mapped[-1] + 5)
@@ -369,12 +369,11 @@ if st.session_state.calculated:
         ax_main.xaxis.set_major_locator(MultipleLocator(10 if (max_x - force_min_x) > 200 else 5))
         ax_main.xaxis.set_major_formatter(FuncFormatter(force_tick_formatter))
         ax_main.set_xlabel('Питомі сили, Н/кН', fontsize=12)
-        ax_main.tick_params(axis='x', labelbottom=True) # Примусове відображення міток осі X
+        ax_main.tick_params(axis='x', labelbottom=True)
 
         x_time_plot, y_time_plot = [], []
         current_period = 0
         
-        # Динамічний масштаб для осі часу, щоб 10 хв = 100 по висоті для збігу
         time_scale_factor = v_plot_max / 10.0
 
         for i in range(len(time_log)):
@@ -427,7 +426,7 @@ if st.session_state.calculated:
         ax_prof_km.xaxis.set_ticks_position('bottom')
         ax_prof_km.xaxis.set_label_position('bottom')
         ax_prof_km.spines['bottom'].set_position(('outward', 0))
-        ax_prof_km.set_xlabel(f'Відстань S, км (початок відліку: 0 км)', color='blue', fontsize=12)
+        ax_prof_km.set_xlabel(f'Відстань S, км (початок відліку: -{start_x_offset} Н/кН)', color='blue', fontsize=12)
         ax_prof.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
 
         curr_x = 0
