@@ -145,13 +145,6 @@ default_profile = pd.DataFrame({
 })
 edited_profile = st.sidebar.data_editor(default_profile, num_rows="dynamic")
 
-with st.sidebar.expander("⚡ Струмові характеристики (I від v)"):
-    default_current = pd.DataFrame({
-        "v, км/год": loco_data["v"],
-        "I, А": [0.0] * len(loco_data["v"])
-    })
-    edited_current = st.data_editor(default_current, num_rows="dynamic")
-
 calc_button = st.sidebar.button("🚀 Розрахувати", use_container_width=True)
 
 if calc_button:
@@ -177,11 +170,6 @@ if st.session_state.calculated:
     edited_profile['Довжина, м'] = pd.to_numeric(edited_profile['Довжина, м'], errors='coerce')
     edited_profile['Ухил, ‰'] = pd.to_numeric(edited_profile['Ухил, ‰'], errors='coerce')
     edited_profile = edited_profile.dropna()
-
-    edited_current["v, км/год"] = pd.to_numeric(edited_current["v, км/год"], errors='coerce')
-    edited_current["I, А"] = pd.to_numeric(edited_current["I, А"], errors='coerce')
-    edited_current = edited_current.dropna()
-    current_interp = interp1d(edited_current["v, км/год"], edited_current["I, А"], bounds_error=False, fill_value=0)
     
     # ------------------------------------------
     # ДИНАМІЧНИЙ РОЗРАХУНОК МЕЖ ГРАФІКІВ
@@ -251,7 +239,7 @@ if st.session_state.calculated:
     # КРОК 2: ІНТЕГРУВАННЯ ТА ГРАФІК РУХУ
     # ------------------------------------------
     with tab2:
-        st.subheader("Побудова кривих швидкості, часу, струму та профілю колії")
+        st.subheader("Побудова кривих швидкості, часу та профілю колії")
         
         dt = 1.0 
         t_max = 7200 
@@ -259,7 +247,7 @@ if st.session_state.calculated:
         S_target_limit = total_distance - edited_profile.iloc[-1]['Довжина, м'] - (l_p / 2)
         v_target_limit = 50 / 3.6 
 
-        time_log, distance_log, velocity_log, mode_log, current_log = [0], [0], [0], ['т'], [current_interp(0)]
+        time_log, distance_log, velocity_log, mode_log = [0], [0], [0], ['т']
         v_ms, s, t = 0.0, 0.0, 0.0
         is_braking_to_stop = False
 
@@ -330,7 +318,6 @@ if st.session_state.calculated:
             distance_log.append(s / 1000)
             velocity_log.append(v_ms * 3.6)
             mode_log.append(mode)
-            current_log.append(float(current_interp(v_ms * 3.6)) if mode == 'т' else 0.0)
             
             if i % 100 == 0: progress_bar.progress(min(s / total_distance, 1.0))
             if is_braking_to_stop and v_ms == 0: break
@@ -407,20 +394,7 @@ if st.session_state.calculated:
         secax_time.set_ylabel('Час t, хв', color='red', fontsize=12)
         secax_time.set_yticks(np.arange(0, int(np.ceil(time_log[-1])) + 2, 1))
 
-        # --- КРИВА СТРУМУ ---
-        ax_curr = ax_main.twinx()
-        ax_curr.spines['right'].set_position(('outward', 55)) # Зміщуємо вісь праворуч, щоб не накладалася на вісь часу
-        ax_curr.plot(x_dist_mapped, current_log, color='magenta', lw=1.5, label='Струм I')
-        ax_curr.set_ylabel('Струм I, А', color='magenta', fontsize=12)
-        ax_curr.tick_params(axis='y', labelcolor='magenta')
-        max_curr = max(current_log) if max(current_log) > 0 else 100
-        ax_curr.set_ylim(0, max_curr * 1.2)
-
-        # Об'єднана легенда
-        lines_1, labels_1 = ax_main.get_legend_handles_labels()
-        lines_2, labels_2 = ax_curr.get_legend_handles_labels()
-        ax_main.legend(lines_1 + lines_2, labels_1 + labels_2, loc='upper right')
-
+        ax_main.legend(loc='upper right')
         ax_main.grid(True, linestyle='--')
         ax_main.set_title("Графік тягових розрахунків на ділянці", fontsize=14)
 
