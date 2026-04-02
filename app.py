@@ -140,8 +140,8 @@ v_p = st.sidebar.number_input("Розрахункова швидкість, км
 
 st.sidebar.subheader("Профіль колії")
 default_profile = pd.DataFrame({
-    "Довжина, м": [1500, 2000, 1000, 2500, 3000],
-    "Ухил, ‰": [0, 8, 12, -5, 2]
+    "Довжина, м": pd.Series([], dtype=float),
+    "Ухил, ‰": pd.Series([], dtype=float)
 })
 edited_profile = st.sidebar.data_editor(default_profile, num_rows="dynamic")
 
